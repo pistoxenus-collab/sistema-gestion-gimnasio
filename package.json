@@ -8,7 +8,9 @@
     "server": "tsx watch server/index.ts",
     "client": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "git:setup": "node scripts/git-setup.js",
+    "git:push": "node scripts/git-push.js"
   },
   "keywords": [],
   "author": "",
