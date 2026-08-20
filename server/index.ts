@@ -18,15 +18,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = Number(process.env.PORT) || 4000;
+const HOST = '0.0.0.0';
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 
 // Initialize database and seed with initial data
-initDatabase();
-seedDatabase();
+try {
+  initDatabase();
+  seedDatabase();
+  console.log('✅ Base de datos inicializada y verificada correctamente.');
+} catch (err) {
+  console.error('⚠️ Error al inicializar base de datos:', err);
+}
 
 // API Routes
 app.use('/api/auth', authRouter);
@@ -37,12 +43,17 @@ app.use('/api/users', usersRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', name: 'F6 Deporte y Recreación API', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    name: 'F6 Deporte y Recreación API', 
+    timestamp: new Date().toISOString() 
+  });
 });
 
 // Serve frontend in production
-const distPath = path.resolve(__dirname, '../dist');
+const distPath = path.resolve(process.cwd(), 'dist');
 if (fs.existsSync(distPath)) {
+  console.log(`📁 Sirviendo archivos estáticos desde: ${distPath}`);
   app.use(express.static(distPath));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) {
@@ -50,9 +61,11 @@ if (fs.existsSync(distPath)) {
     }
     res.sendFile(path.join(distPath, 'index.html'));
   });
+} else {
+  console.log('ℹ️ Modo desarrollo o dist no generado aún.');
 }
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`⚡ Servidor F6 Deporte y Recreación corriendo en el puerto ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`⚡ Servidor F6 Deporte y Recreación activo en http://${HOST}:${PORT}`);
 });
