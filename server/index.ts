@@ -50,12 +50,12 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// Serve frontend in production
+// Serve frontend in production (Express 5 compatible SPA fallback)
 const distPath = path.resolve(process.cwd(), 'dist');
 if (fs.existsSync(distPath)) {
   console.log(`📁 Sirviendo archivos estáticos desde: ${distPath}`);
   app.use(express.static(distPath));
-  app.get('*', (req, res, next) => {
+  app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
