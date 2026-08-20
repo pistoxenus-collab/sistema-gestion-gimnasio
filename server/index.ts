@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { initDatabase } from './db';
 import { seedDatabase } from './seed';
 import { authRouter } from './routes/auth.routes';
@@ -11,6 +14,9 @@ import { usersRouter } from './routes/users.routes';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -18,7 +24,7 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize database and seed with rich test data
+// Initialize database and seed with initial data
 initDatabase();
 seedDatabase();
 
@@ -34,7 +40,19 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', name: 'F6 Deporte y Recreación API', timestamp: new Date().toISOString() });
 });
 
+// Serve frontend in production
+const distPath = path.resolve(__dirname, '../dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 // Start server
 app.listen(PORT, () => {
-  console.log(`⚡ Servidor F6 Deporte y Recreación corriendo en http://localhost:${PORT}`);
+  console.log(`⚡ Servidor F6 Deporte y Recreación corriendo en el puerto ${PORT}`);
 });
