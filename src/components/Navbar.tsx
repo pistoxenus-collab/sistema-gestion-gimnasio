@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { authApi } from '../services/api';
-import { User } from '../types';
 import { 
-  Dumbbell, 
   Calendar, 
   BookCheck, 
   BarChart3, 
   Users, 
   User as UserIcon, 
   LogOut, 
-  ChevronDown, 
-  ShieldAlert, 
-  Sparkles,
-  Phone
+  ChevronDown
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -23,17 +17,11 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenProfile }) => {
-  const { user, logout, isProfessor, quickLogin } = useAuth();
-  const [demoUsers, setDemoUsers] = useState<User[]>([]);
+  const { user, logout, isProfessor } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showSwitchModal, setShowSwitchModal] = useState(false);
-
-  useEffect(() => {
-    authApi.getDemoUsers().then(setDemoUsers).catch(console.error);
-  }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
+    <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           
@@ -47,12 +35,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenP
                 className="relative h-10 sm:h-12 w-auto object-contain rounded-lg bg-slate-900 px-1 py-0.5 border border-slate-700" 
               />
             </div>
-            <div className="hidden sm:block">
-              <div className="text-lg font-black tracking-tight f6-gradient-text">
+            <div>
+              <div className="text-base sm:text-lg font-black tracking-tight f6-gradient-text">
                 F6 DEPORTE Y RECREACIÓN
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
-                Plataforma de Clases & Reservas
+              <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold hidden sm:block">
+                Gestión de Clases & Reservas
               </div>
             </div>
           </div>
@@ -112,22 +100,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenP
             )}
           </nav>
 
-          {/* User Profile & Demo Switcher */}
+          {/* User Profile Menu */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Fast Demo Account Switcher Button */}
-            <button
-              onClick={() => setShowSwitchModal(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs text-cyan-300 font-medium transition shadow-sm"
-              title="Cambiar entre cuenta de Profesor y Alumno"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span className="hidden sm:inline">Probar como:</span>
-              <span className="font-bold bg-slate-900 px-1.5 py-0.5 rounded text-[11px] text-white">
-                {isProfessor ? 'Profesor' : 'Alumno'}
-              </span>
-            </button>
-
-            {/* Profile Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
@@ -145,13 +119,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenP
                     {user?.name}
                   </div>
                   <div className="text-[10px] text-slate-400 capitalize">
-                    {isProfessor ? 'Profesor F6' : 'Alumno'}
+                    {isProfessor ? 'Profesor F6' : 'Socio F6'}
                   </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
-              {/* User Menu Modal */}
+              {/* User Dropdown Menu */}
               {showUserMenu && (
                 <>
                   <div 
@@ -165,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenP
                       <span className={`inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                         isProfessor ? 'bg-fuchsia-500/20 text-fuchsia-400' : 'bg-cyan-500/20 text-cyan-400'
                       }`}>
-                        {isProfessor ? 'Profesor / Admin' : 'Socio / Alumno'}
+                        {isProfessor ? 'Profesor / Coach' : 'Socio Activo'}
                       </span>
                     </div>
 
@@ -178,17 +152,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenP
                     >
                       <UserIcon className="w-4 h-4 text-slate-400" />
                       <span>Mi Perfil & Datos</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setShowUserMenu(false);
-                        setShowSwitchModal(true);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-cyan-300 hover:text-cyan-200 hover:bg-cyan-950/40 transition"
-                    >
-                      <Sparkles className="w-4 h-4 text-cyan-400" />
-                      <span>Cambiar de Usuario Demo</span>
                     </button>
 
                     <div className="my-1 border-t border-slate-800"></div>
@@ -211,106 +174,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenP
 
         </div>
       </div>
-
-      {/* Demo Account Switcher Modal */}
-      {showSwitchModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">Selector Rápido de Cuenta Demo</h3>
-              </div>
-              <button 
-                onClick={() => setShowSwitchModal(false)}
-                className="text-slate-400 hover:text-white text-lg px-2"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-              Prueba la plataforma desde la perspectiva del <strong>Profesor</strong> (crear clases, ver inscritos, reportes mensuales) o de un <strong>Alumno</strong> (inscribirse/desinscribirse de clases del día).
-            </p>
-
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-              <div className="text-[11px] font-bold text-fuchsia-400 uppercase tracking-wider px-1">
-                Profesor / Administración
-              </div>
-              {demoUsers.filter(u => u.role === 'professor' || u.role === 'admin').map(u => (
-                <button
-                  key={u.id}
-                  onClick={() => {
-                    quickLogin(u.id);
-                    setShowSwitchModal(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition ${
-                    user?.id === u.id
-                      ? 'bg-fuchsia-950/40 border-fuchsia-500/50 text-white'
-                      : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-200'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
-                      {u.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-white">{u.name}</div>
-                      <div className="text-[11px] text-slate-400">{u.email}</div>
-                    </div>
-                  </div>
-                  {user?.id === u.id && (
-                    <span className="text-[10px] bg-fuchsia-500 text-white px-2 py-0.5 rounded-full font-bold">
-                      Activo
-                    </span>
-                  )}
-                </button>
-              ))}
-
-              <div className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider px-1 pt-2">
-                Alumnos / Socios
-              </div>
-              {demoUsers.filter(u => u.role === 'student').map(u => (
-                <button
-                  key={u.id}
-                  onClick={() => {
-                    quickLogin(u.id);
-                    setShowSwitchModal(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition ${
-                    user?.id === u.id
-                      ? 'bg-cyan-950/40 border-cyan-500/50 text-white'
-                      : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-200'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs">
-                      {u.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-white">{u.name}</div>
-                      <div className="text-[11px] text-slate-400">{u.email}</div>
-                    </div>
-                  </div>
-                  {user?.id === u.id && (
-                    <span className="text-[10px] bg-cyan-500 text-slate-950 px-2 py-0.5 rounded-full font-bold">
-                      Activo
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-800 flex justify-end">
-              <button
-                onClick={() => setShowSwitchModal(false)}
-                className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
